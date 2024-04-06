@@ -19,4 +19,4 @@ A shared repository for BCI learning
     * python版本
   * 公开数据集
 
-情感脑机(等待加入...)
+* 情感脑机,[jybuchiyu](https://github.com/6jybuchiyu)连接成功！
