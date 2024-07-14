@@ -1,0 +1,189 @@
+algorithm: TFformer3
+classes: 12 # 哪个分类数据 12-Dial 40-tsinghua
+
+# Parameters for training procedure
+train_param:
+  UD: 1                 # -1——Unsupervised, 0——User-Dependent；1——User-Independent
+  ratio: 0              # -1——Training-Free, 1——80% vs 20%;2——50% vs 50%;3——20% vs 80%(UD Approach)
+                         # 0 or else——(N-1)/N vs 1/N(UI Approach)
+
+# Parameters for ssvep data
+data_param_12:
+  ws: 1.0                      # window size of ssvep
+  Nh: 180                      # number of trial
+  Nc: 8                        # number of channel
+  Fs: 256                      # frequency of sample
+  Nf: 12                       # number of stimulus
+  Ns: 3                       # number of subjects
+
+data_param_40:
+  ws: 1.0                      # window size of ssvep
+  Nh: 240                      # number of trial
+  Nc: 9                        # number of channel
+  Fs: 250                      # frequency of sample
+  Nf: 40                       # number of stimulus
+  Ns: 3                       # number of subjects
+
+# Parameters for DL-based methods
+EEGNet:
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+CCNN:
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+FBtCNN:
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.01                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+ConvCA:
+#  epochs: 1000                  # number of epochs
+#  bz: 30                     # batch size
+#  lr: 0.0008                       # learning rate
+#  wd: 0.0000                  # weight decay
+#  lr_jitter: false             # learning rate scheduler
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.01                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+SSVEPNet:
+  epochs: 1                  # number of epochs
+  bz: 64                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+  stimulus_type: 40            # 4-class or 12-class
+
+SSVEPformer:
+  epochs: 100                  # number of epochs
+  bz: 64                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+SSVEPformer2:
+  epochs: 40                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+SSVEPformer3:
+  epochs: 40                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+KANformer:
+  width: [48, 30, 12]
+  epochs: 20               # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+FBSSVEPformer:
+  epochs: 100                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.002                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+TFformer:
+  epochs: 200                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.002                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+TFFBformer:
+  epochs: 80                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.002                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+iTransformer:
+  epochs: 100                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+DDGCNN:
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.001                   # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+  lr_decay_rate: 0.75         # learning rate decay rate
+  optim_patience: 300        # optimizer patience
+  trans_class: DCD           # {DCD, linear, normal_conv}
+  act: leakyrelu             # activation layer {relu, prelu, leakyrelu}
+  norm: layer                # {batch, layer, instance} normalization
+  n_filters: 128            # 64 or 128
+
+CNNBIGRU:
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.01                       # learning rate
+  wd: 0.0003                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+  stimulus_type: 4            # 4-class or 12-class
+
+CAIFormer:
+  epochs: 500                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.01                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: false             # learning rate scheduler
+
+
+CAIFormerNew:
+  epochs: 100                  # number of epochs
+  bz: 30                     # batch size
+  lr: 0.01                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true              # learning rate scheduler
+
+TFformerAtt:
+  epochs: 120                  # number of epochs
+  bz: 64                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+TFformer3:
+  epochs: 1                  # number of epochs
+  bz: 64                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+FBTFformer3:
+  subnet_epochs: 40
+  epochs: 40                  # number of epochs
+  bz: 50                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler
+
+TFFFormer:
+  epochs: 1                  # number of epochs
+  bz: 64                     # batch size
+  lr: 0.001                       # learning rate
+  wd: 0.0001                   # weight decay
+  lr_jitter: true             # learning rate scheduler

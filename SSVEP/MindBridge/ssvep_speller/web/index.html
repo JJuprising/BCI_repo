@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">
+    <meta name="description" content="QuickSSVEP - A tool for setting up SSVEP stimulator">
+    <title>Quick SSVEP</title>
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="js/FileSaver.min.js"></script>
+    <!--<script type="text/javascript" src="js/jquery-migrate-1.0.0.min.js"></script>-->
+    <!--<script type="text/javascript" src="js/jquery-migrate-1.0.0.js"></script>-->
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="js/stim.js"></script>
+    <script src="./eel.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #fpsDisplay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 10px; /* 可以根据需要调整内边距 */
+            background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色，可以根据需要调整透明度 */
+            z-index: 9999; /* 设置z-index确保元素在最前面 */
+        }
+    </style>
+</head>
+<body>
+<div id="fpsDisplay"></div>
+<script type="text/javascript">
+    SSVEPStim = new SSVEP();
+    // Check that service workers are registered
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./sw.js');
+        });
+    }
+    // 获取ID为fpsDisplay的div
+    const fpsDisplay = document.getElementById('fpsDisplay');
+
+    let lastTime = 0;
+    let frameCount = 0;
+
+    function updateFPS(currentTime) {
+        // 计算两次调用之间的时间间隔
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        // 计算帧率
+        const fps = 1000 / deltaTime;
+
+        // 更新显示帧率的元素
+        fpsDisplay.textContent = 'FPS: ' + fps.toFixed(2);
+
+        // 递归调用requestAnimationFrame
+        requestAnimationFrame(updateFPS);
+    }
+
+    // 启动动画循环
+    requestAnimationFrame(updateFPS);
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Fold1,Mean±Std,epochs,bz,lr,wd,lr_jitter,stimulus_type
+3.12,3.12±nan,1.0,64.0,0.001,0.0001,True,40.0
+3.12,3.12±nan,,,,,,
+3.12,3.12±nan,,,,,,
+3.12,3.12±0.00,,,,,,
