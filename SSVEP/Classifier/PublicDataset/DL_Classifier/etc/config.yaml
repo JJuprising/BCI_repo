@@ -1,4 +1,4 @@
-algorithm: TFformer3
+algorithm: TFformerAtt
 classes: 12 # 哪个分类数据 12-Dial 40-tsinghua
 
 # Parameters for training procedure
@@ -9,20 +9,20 @@ train_param:
 
 # Parameters for ssvep data
 data_param_12:
-  ws: 1.0                      # window size of ssvep
+  ws: 0.5                      # window size of ssvep
   Nh: 180                      # number of trial
   Nc: 8                        # number of channel
   Fs: 256                      # frequency of sample
   Nf: 12                       # number of stimulus
-  Ns: 3                       # number of subjects
+  Ns: 10                       # number of subjects
 
 data_param_40:
-  ws: 1.0                      # window size of ssvep
+  ws: 0.5                      # window size of ssvep
   Nh: 240                      # number of trial
   Nc: 9                        # number of channel
   Fs: 250                      # frequency of sample
   Nf: 40                       # number of stimulus
-  Ns: 3                       # number of subjects
+  Ns: 35                       # number of subjects
 
 # Parameters for DL-based methods
 EEGNet:
@@ -59,12 +59,12 @@ ConvCA:
   lr_jitter: false             # learning rate scheduler
 
 SSVEPNet:
-  epochs: 1                  # number of epochs
+  epochs: 100                  # number of epochs
   bz: 64                     # batch size
   lr: 0.001                       # learning rate
   wd: 0.0001                   # weight decay
   lr_jitter: true             # learning rate scheduler
-  stimulus_type: 40            # 4-class or 12-class
+  stimulus_type: 12            # 4-class or 12-class
 
 SSVEPformer:
   epochs: 100                  # number of epochs
@@ -151,23 +151,22 @@ CAIFormer:
   wd: 0.0001                   # weight decay
   lr_jitter: false             # learning rate scheduler
 
-
 CAIFormerNew:
   epochs: 100                  # number of epochs
   bz: 30                     # batch size
   lr: 0.01                       # learning rate
   wd: 0.0001                   # weight decay
   lr_jitter: true              # learning rate scheduler
-
+  
 TFformerAtt:
-  epochs: 120                  # number of epochs
+  epochs: 100                  # number of epochs
   bz: 64                     # batch size
   lr: 0.001                       # learning rate
   wd: 0.0001                   # weight decay
   lr_jitter: true             # learning rate scheduler
 
 TFformer3:
-  epochs: 1                  # number of epochs
+  epochs: 100                  # number of epochs
   bz: 64                     # batch size
   lr: 0.001                       # learning rate
   wd: 0.0001                   # weight decay
@@ -182,7 +181,7 @@ FBTFformer3:
   lr_jitter: true             # learning rate scheduler
 
 TFFFormer:
-  epochs: 1                  # number of epochs
+  epochs: 100                  # number of epochs
   bz: 64                     # batch size
   lr: 0.001                       # learning rate
   wd: 0.0001                   # weight decay

@@ -38,7 +38,7 @@ class GELU(nn.Module):
         return F.relu(x)
 
 
-def Corr(Raw,T):
+def Corr(Raw):
     n_sam = Raw.size(0)
     Raw = Raw.cpu()
     Raw = Raw.data.numpy()
@@ -47,7 +47,7 @@ def Corr(Raw,T):
     fft_matrix = np.abs(fft(Raw, axis=-1))
     FFT_matrix = fft_matrix
 
-    FFT_matrix = torch.FloatTensor(FFT_matrix / T) # 源代码config.fttn=500
+    FFT_matrix = torch.FloatTensor(FFT_matrix / 500) # 源代码config.fttn=500
     FFT_matrix = FFT_matrix
     FFT_matrix = FFT_matrix.unsqueeze(1)
     return FFT_matrix
@@ -74,9 +74,9 @@ class PositionalEncoding(nn.Module):
 
 
 class PatchEmbedding(nn.Module):
-    def __init__(self, device, in_channels, patch_sizeh,
-                 patch_sizew, emb_size, img_size1,
-                 img_size2):
+    def __init__(self, device, in_channels: int = 1, patch_sizeh: int = 16,
+                 patch_sizew: int = 16, emb_size: int = 128, img_size1: int = 64,
+                 img_size2: int = 250):
         super(PatchEmbedding, self).__init__()
         self.patch_sizeh = patch_sizeh
         self.patch_sizew = patch_sizew
@@ -175,13 +175,9 @@ class Feed_Forward(nn.Module):
         self.gelu = GELU().to(device)
 
     def forward(self, x):
-        print("Feed_Forward input shape : {}".format(x.shape)) # ([64, 125, 128])
-        output = self.gelu(self.conv1(x.unsqueeze(1))) # ([64, 16, 8, 8])
-        print("Feed_Forward output shape : {}".format(output.shape))
-        output = self.dropout(output)# ([64, 16, 8, 8])
-        print("Feed_Forward output shape : {}".format(output.shape))
-        output = output.contiguous().view(-1, self.num_flat_features(output)) # torch.Size([64, 1024]) 计算除了批次维度外的所有维度的乘积
-        print("Feed_Forward output shape : {}".format(output.shape))
+        output = self.gelu(self.conv1(x.unsqueeze(1)))
+        output = self.dropout(output)
+        output = output.contiguous().view(-1, self.num_flat_features(output)) # 12class [64,16,4,6]->[64,512] 40class [64,16,2,8]->[64,256]
         return output
 
     def num_flat_features(self, x):
@@ -273,7 +269,7 @@ class Cross_modal(nn.Module):
         super(Cross_modal, self).__init__()
         self.cross1 = Decoder(device, dim_seq, dim_fea, n_heads, hidden).to(device)
         self.cross2 = Decoder(device,dim_seq, dim_fea, n_heads, hidden).to(device)
-        self.fc1 = nn.Linear(2 * dim_seq, dim_seq).to(device) # dim_fea就是dmodel
+        self.fc1 = nn.Linear(2 * dim_seq, dim_seq).to(device) # dim_seq就是dmodel
 
     def forward(self, target, f1):
         re = self.cross1(f1, target)
@@ -297,13 +293,9 @@ class Cross_modalto(nn.Module):
         self.add_norm = Add_Norm(device=device).to(device)
 
     def forward(self, q, v): # v
-        print("Cross_modalto input shape : {}".format(v.shape))
         output = self.add_norm(v, self.muti_atten, y=q, requires_mask=True) # 变成v的维度
-        print("Cross_modalto output shape : {}".format(output.shape))
-        output = output + v # ([64, 125, 128])
-        print("Cross_modalto output shape : {}".format(output.shape))
+        output = output + v
         output = self.feed_forward(output)
-        print("Cross_modalto output shape : {}".format(output.shape))
         return output
 
 
@@ -328,15 +320,12 @@ class TFFFormer(nn.Module):
     patch_sizew=config.patchsizefw
     config.T
     config.d_model
-    N:the number o successive encoder layers
     """
-
-
     def __init__(self, device, heads, N, chs_num,class_num,T):
         super(TFFFormer, self).__init__()
         self.device=device
         self.patchsize=16
-        self.d_model=128 # 128代表2s
+        self.d_model=128
         self.output_dim = class_num
         self.dropout_level = 0.45
         self.patchsizefh=chs_num
@@ -344,12 +333,10 @@ class TFFFormer(nn.Module):
         self.d_model=128
         self.H=chs_num//self.patchsize
         self.W=T//self.patchsize
-        self.T=T
-
         # Patch Embedding
-        self.embedding_t = PatchEmbedding(device=device, in_channels=1,patch_sizeh=self.patchsizefh,
+        self.embedding_t = PatchEmbedding(device=device, patch_sizeh=self.patchsizefh,
                                           patch_sizew=self.patchsizefw,emb_size=self.d_model,img_size1=chs_num,img_size2=T).to(device)
-        self.embedding_f = PatchEmbedding(device=device,in_channels=1,patch_sizeh=self.patchsizefh,
+        self.embedding_f = PatchEmbedding(device=device, patch_sizeh=self.patchsizefh,
                                           patch_sizew=self.patchsizefw,emb_size=self.d_model,img_size1=chs_num,img_size2=T).to(device)
         self.norm = nn.LayerNorm(T).to(device)
         self.norm1 = nn.LayerNorm(T).to(device)
@@ -358,36 +345,27 @@ class TFFFormer(nn.Module):
         self.model = nn.Sequential(*[Transformer_layer(device,dmodel=self.d_model,num_heads=heads,num_tokens=self.H*self.W) for _ in range(N)]).to(device)
         self.model_last = Cross_modalto(device,dim_seq=4*self.H*self.W,dim_fea=self.d_model,n_heads=heads,hidden=self.d_model*4).to(device)
 
-        # cross-modal 因为self.H*self.W才导致维度的改变
+        # cross-modal
         self.t = Cross_modal(device,dim_seq=self.H*self.W,dim_fea=self.d_model,n_heads=heads,hidden=self.d_model*4).to(device)
         self.f = Cross_modal(device,dim_seq=self.H*self.W,dim_fea=self.d_model,n_heads=heads,hidden=self.d_model*4).to(device)
         self.t1 = Cross_modal(device,dim_seq=self.H*self.W,dim_fea=self.d_model,n_heads=heads,hidden=self.d_model*4).to(device)
         self.f1 = Cross_modal(device,dim_seq=self.H*self.W,dim_fea=self.d_model,n_heads=heads,hidden=self.d_model*4).to(device)
         self.fc1 = nn.Linear(self.d_model * 2, self.d_model) #(256,128)
-        self.fcin = self._calculate_fcin()
-        self.fc = nn.Linear(self.fcin, self.output_dim) #(512,40)
-        # self.fc = nn.Linear(256, self.output_dim)
+        # self.fc = nn.Linear(16 * 6 * (self.d_model // 32), self.output_dim)
+        # self.fc = nn.Linear(640, self.output_dim) # 0.9s
+        self.fc = nn.Linear(640, self.output_dim)
 
-    def _calculate_fcin(self):
-        # 创建一个虚拟的输入张量来计算 `Feed_Forward` 输出的特征数量
-        # dummy_input = torch.zeros(1, self.H * self.W, self.d_model).to(self.device)
-        # with torch.no_grad():
-        #     output = self.model_last.feed_forward(dummy_input)
-        return 1024
     def forward(self, raw):
-        print(raw.shape)
         x_t1 = self.embedding_t(raw).to(self.device)
-        # print(self.T)
+
         # 进行fft操作
-        fre=Corr(raw,self.T).to(self.device)
-        # print(fre.shape)
+        fre=Corr(raw).to(self.device)
         x_f1 = self.embedding_f(self.norm(fre))
-        print("x_t1's shape",x_t1.shape)
-        print("x_t1's shape",x_t1.shape)
+
         # temporal data encoder
         x_t = self.model(x_t1)
         # frequency data encoder
-        x_f = self.model(x_f1) # 不改变维度
+        x_f = self.model(x_f1)
         # cross-modal
 
         # x_raw2 = self.raw(x_raw,x_f)
@@ -396,15 +374,7 @@ class TFFFormer(nn.Module):
 
         x_t2 = x_t + x_t2
         x_f2 = x_f + x_f2
-        print("x_t2's shape",x_t2.shape)
-        print("x_f2's shape",x_f2.shape)
-        x = torch.cat((x_f2, x_t2), axis=1) # ([64, 124, 128])
-        y=self.fc1(torch.cat((x_f2, x_t2), axis=-1))
-        print("x's shape",x.shape) #  2s ([64, 250, 128]) 1s ([64, 124, 128])
-        print("y's shape",y.shape) # 2s ([64, 125, 128]) 1s ([64, 62, 128])
-        output = self.model_last(x, y)
-        print("output's shape",output.shape) # 40: 2s-1024  1.2s -640  1.1s1.0s-512 0.8s0.9s-384 0.5s0.6s0.7s-256 0.5s-256   12: 1*256-512
+        x = torch.cat((x_f2, x_t2), axis=1)
+        output = self.model_last(x, self.fc1(torch.cat((x_f2, x_t2), axis=-1)))
         output = self.fc(output)
         return output
-
-

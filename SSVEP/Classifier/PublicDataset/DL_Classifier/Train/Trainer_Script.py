@@ -66,11 +66,11 @@ def data_preprocess(EEGData_Train, EEGData_Test,ws):
 
     '''Loading Training Data'''
     EEGData_Train, EEGLabel_Train = EEGData_Train[:]
-    EEGData_Train = EEGData_Train[:, :, :, int(Fs * last_time):int(Fs * ws)+int(Fs * last_time)]
+    EEGData_Train = EEGData_Train[:, :, :, int(Fs * last_time):int(Fs * ws) +int(Fs * last_time)]
 
     '''Loading Testing Data'''
     EEGData_Test, EEGLabel_Test = EEGData_Test[:]
-    EEGData_Test = EEGData_Test[:, :, :, int(Fs * last_time):int(Fs * ws)+int(Fs * last_time)]
+    EEGData_Test = EEGData_Test[:, :, :, int(Fs * last_time):int(Fs * ws) +int(Fs * last_time)]
 
     EEGData_Train, EEGData_Test = normalize_data(EEGData_Train, EEGData_Test)
 

@@ -122,7 +122,7 @@ def run():
                 # print(net)
                 val_interval=1
                 test_acc = Classifier_Trainer.train_on_batch(testSubject, epochs, val_interval, eeg_train_dataloader, eeg_test_dataloader, optimizer,
-                                                             criterion,net, devices, ws,lr_jitter=lr_jitter)
+                                                             criterion,net, devices, ws, lr_jitter)
 
                 final_test_acc_list.append(test_acc)
                 print(f"Subject {testSubject} Test Accuracy: {test_acc:.3f}")

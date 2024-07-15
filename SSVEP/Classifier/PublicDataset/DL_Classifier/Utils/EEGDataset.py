@@ -235,7 +235,7 @@ class getSSVEP40Inter(Dataset):
         fs = self.Fs
         dataFiltered = None
         if filterType == 0:
-            Wn = [7.0, 70.0]
+            Wn = [8.0, 64.0]
             Wn = np.array(Wn, np.float64) / (fs / 2)
             b, a = SIG.cheby1(4, 0.1, Wn, btype="bandpass", analog=False, output='ba')
             dataFiltered = SIG.lfilter(b, a, data, axis=1)
@@ -254,7 +254,7 @@ class getSSVEP40Inter(Dataset):
         # # O1, Oz, O2, PO3, POZ, PO4, PZ, PO5 and PO6 对应 61, 62, 63, 55, 56, 57, 48, 54, 58
         # chnls = [48, 54, 55, 56, 57, 58, 61, 62, 63]
         # samples = samples[chnls, :, :, :]
-        samples=np.load(r'../data/tsinghua/S' + str(index) + r'.npy') # (9,1500,40,6) (通道数，采样点，刺激目标，blocks)
+        samples=np.load(r'../data/tsinghua/S' + str(index) + r'.npy') # (9,1500,40,6)
         # 滤波
         samples = self.SSVEPFilter(eegData=samples)
         # print(f'subject {self.subject} data shape: {samples.shape}')
@@ -394,7 +394,7 @@ class getSSVEP40Intra(Dataset):
         # 直接记载处理好的npy
         samples = np.load(r'../data/tsinghua/S' + str(self.subject) + r'.npy')  # (9,1500,40,6)
         # 滤波
-        samples=self.SSVEPFilter(eegData=samples)
+        # samples=self.SSVEPFilter(eegData=samples)
         # print(f'subject {self.subject} data shape: {samples.shape}')
         # 处理格式
 
