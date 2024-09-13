@@ -14,8 +14,8 @@ from etc.global_config import config
 
 def run():
     # 1、Define parameters of eeg
-    algorithm = config['algorithm']
-    classes = config['classes']
+    algorithm = config['algorithm'] # 本次训练的模型
+    classes = config['classes'] # 本次训练所用到数据集
 
     print(f"{'*' * 20} Current Algorithm usage: {algorithm} Using Dataset {classes} classes {'*' * 20}")
     train_radio = 0.8
@@ -38,9 +38,10 @@ def run():
     elif ratio == 3:
         train_radio = 0.2
     '''Parameters for ssvep data'''
+    # 这两个公开数据集的采样率和注视时间是不一样的
     if classes == 12:
-        ws = config["data_param_12"]["ws"]
-        Ns = config["data_param_12"]['Ns']
+        ws = config["data_param_12"]["ws"] # 有效数据时间
+        Ns = config["data_param_12"]['Ns'] # 被试数量
     if classes == 40:
         ws = config["data_param_40"]["ws"]
         Ns = config["data_param_40"]['Ns']
@@ -59,7 +60,7 @@ def run():
         final_test_acc_list = []
         # config["data_param_12"]["ws"] = 2.0
 
-        for testSubject in range(1, Ns + 1): # 不同被试都要重新再一遍数据显得很冗余
+        for testSubject in range(1, Ns + 1): # 不同被试都要重新再一遍数据显得很冗余 [1,11)
             # **************************************** #
             '''12-class SSVEP Dataset'''
             # -----------Intra-Subject Experiments--------------
@@ -74,7 +75,7 @@ def run():
             #     EEGData_Test = Temp
 
             # -----------12classes Experiments--------------
-            if classes == 12:
+            if classes == 12: # 数据集1
                 # -----------12classes Intra-Subject Experiments--------------
                 if UD == 0:
                     EEGData_Train = EEGDataset.getSSVEP12Intra(subject=testSubject, train_ratio=train_radio,
@@ -86,7 +87,7 @@ def run():
                                                                mode='train')
                     EEGData_Test = EEGDataset.getSSVEP12Inter(subject=testSubject,  mode='test')
             # -----------40classes  Experiments--------------
-            elif classes == 40:
+            elif classes == 40: # 数据集2
                 # -----------40classes Intra-Subject Experiments--------------
                 if UD == 0:
                     EEGData_Train = EEGDataset.getSSVEP40Intra(subject=testSubject, train_ratio=train_radio,
@@ -104,7 +105,7 @@ def run():
             eeg_train_dataloader, eeg_test_dataloader = Trainer_Script.data_preprocess(EEGData_Train, EEGData_Test,ws)
 
             # Define Network
-            net, criterion, optimizer = Trainer_Script.build_model(devices,ws)
+            net, criterion, optimizer = Trainer_Script.build_model(devices,ws) # net网络结果 criterion optimizer
             # print(net)
             val_interval=1
             test_acc = Classifier_Trainer.train_on_batch(testSubject, epochs, val_interval, eeg_train_dataloader, eeg_test_dataloader, optimizer,
@@ -123,6 +124,6 @@ def run():
     # 3、Plot Result
 
 
-
+# 主函数
 if __name__ == '__main__':
     run()

@@ -47,6 +47,11 @@
 ```
 pip install -r Resource/requirements.txt
 ```
+# Usage
+./ect -配置文件夹目录，包括各种模型参数列表
+./Model -模型文件夹，里面有各种模型的文件，代码是“模型类”
+./Train -训练代码文件夹 配置训练一些方法函数
+./Test -配置参数初始化，循环被试去训练、测试，画图(可视化结果)
 
 # Train and Test
 
